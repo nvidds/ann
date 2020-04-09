@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Annotate Videos</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="googlebot" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+  <script
+    type="text/javascript"
+    src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"
+    
+  ></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js"></script>
+
+
+
+  <style id="compiled-css" type="text/css">
+      body {
+  background: #20262E;
+  padding: 5px;
+  font-family: Helvetica;
+}
+
+#ctrl {
+  background: #fff;
+  border-radius: 4px;
+  padding: 8px 15px 15px 15px;
+  font-size: 14px;
+  text-align: center;
+  transition: all 0.2s;
+  margin: 0 auto;
+  width: 500px;
+}
+
+button {
+  background: #0084ff;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 14px;
+  font-size: 15px;
+  color: #fff;
+    margin: 2px;cursor: pointer;
+}
+
+.a{background: #0084ff}
+.b{background: #30ba8f}
+.c{background: #cf4570}
+.d{background: #ff8d5e}
+
+#ctrl.alt {
+  background: #0084ff;
+  color: #fff;
+  margin-top: 40px;
+  width: 200px;
+}
+
+#ctrl.alt button {
+  background: #fff;
+  color: #000;
+}
+
+      input[type=text], select {
+  width: 80%;
+  padding: 6px 10px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+      
+  </style>
+
+</head>
+<body>
+    
+
+<div style="text-align:center"><video id="video" width="320" height="240" controls muted>
+   <source id="videntry" src="" type='video/mp4'>
+   Your browser does not support the video tag.
+   </video></div>
+
+<div id="ctrl">
+
+</div>
+
+</div>
+
+
+  <!-- TODO: Missing CoffeeScript 2 -->
+
+  <script type="text/javascript">//<![CDATA[
+// data = [
+//   {
+//      "id":"1qe8yxUKVVUy1ThZEfrbvSqjMdl58mY-B",
+//      "cands":[
+//         "walk",
+//         "run",
+//         "swim"
+//      ]
+//   },
+//]
+      function getParameterByName(name) {
+ return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
+}
+      var indx = 0;
+      
+      var b64d = getParameterByName('d');
+      //b64d = b64d.replace ('+','.').replace('/','_').replace('=','-') 
+      b64d = b64d.replace (/\./g,'+').replace(/\_/g,'/').replace(/\-/g,'=');
+      var data = JSON.parse(atob(b64d));
+      var selected = '';
+      var results = [];
+      
+      function next_vid(){
+          if(indx >= data.length){
+              new ClipboardJS('.btn');
+
+              var output = btoa(JSON.stringify(results));
+              $('#ctrl').html('Copy and paste this into the results in mechanical turk.<div id="res"></div>');
+              $('#res').text(output);
+              $('#ctrl').append('<button class="btn" data-clipboard-target="#res">Copy to clipboard</button>')
+              $('#video').remove();
+              return
+          }
+          var vid = data[indx];
+          
+          $('#videntry').attr('src','https://drive.google.com/uc?export=download&id='+vid['id'])
+          $('#video')[0].load();
+          
+          $("#video")[0].play();
+          
+          $('#ctrl').html('<div id="btns"><p>Instructions: Click the button best describing the video. If multiple are accurate, choose the one furthest to the left. For other action, please provide a word or two best describing it.</p><div>');
+          
+          for(var i=0; i < vid['cands'].length; i++){
+              $('#btns').append('<button class="a" id="but'+i+'" val="'+vid['cands'][i]+'">'+vid['cands'][i]+'</button>');
+              $('#but'+i).click(function(){
+                for(var i=0; i < vid['cands'].length; i++){
+                    $('#but'+i).attr('class','a');
+                }
+              $('#otr').attr('class','d');
+              $('#no').attr('class','c');
+                $(this).attr('class', 'b');
+                  selected = $(this).attr('val');
+              });
+          }
+          
+          $('#btns').append('<button class="d" id="otr">Other Action: <input type="text" id="other" name="other" placeholder="Action Word (optional)"></button>');
+          $("#otr").click(function(){
+              for(var i=0; i < vid['cands'].length; i++){
+                    $('#but'+i).attr('class','a');
+                }
+              $('#otr').attr('class','b');
+              $('#no').attr('class','c');
+              selected = 'other';
+          });
+
+          
+          $('#btns').append('<button class="c" id="no">No Action</button>');
+          $("#no").click(function(){
+              for(var i=0; i < vid['cands'].length; i++){
+                    $('#but'+i).attr('class','a');
+                }
+              $('#otr').attr('class','d');
+              $('#no').attr('class','b');
+              selected = 'none';
+          });
+          $('#ctrl').append('<button class="b" id="submit" style="margin-top: 1cm;">Submit</button>');
+          $('#submit').click(function(){
+              r = vid;
+              r['ann'] = selected;
+              r['othertxt'] = $('#other').val();
+              results.push(r);
+              indx += 1;
+              next_vid();
+          });
+      }
+      
+      next_vid();
+
+
+  //]]></script>
+
+</body>
+</html>
