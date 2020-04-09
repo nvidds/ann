@@ -125,7 +125,7 @@ button {
               new ClipboardJS('.btn');
 
               var output = btoa(JSON.stringify(results));
-              $('#ctrl').html('Copy and paste this into the results in mechanical turk.<div id="res"></div>');
+              $('#ctrl').html('Copy and paste this into the results in mechanical turk. Please use the button to ensure it is copied correctly.<div id="res"></div>');
               $('#res').text(output);
               $('#ctrl').append('<button class="btn" data-clipboard-target="#res">Copy to clipboard</button>')
               $('#video').remove();
