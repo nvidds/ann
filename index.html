@@ -118,6 +118,7 @@ button {
       var data = JSON.parse(atob(b64d));
       var selected = '';
       var results = [];
+      var failed = false;
       
       function next_vid(){
           if(indx >= data.length){
@@ -130,6 +131,8 @@ button {
               $('#video').remove();
               return
           }
+          selected = '';
+          failed = false;
           var vid = data[indx];
           
           $('#videntry').attr('src','https://drive.google.com/uc?export=download&id='+vid['id'])
@@ -137,7 +140,7 @@ button {
           
           $("#video")[0].play();
           
-          $('#ctrl').html('<div id="btns"><p>Instructions: Click the button best describing the video. If multiple are accurate, choose the one furthest to the left. For other action, please provide a word or two best describing it.</p><div>');
+          $('#ctrl').html('<div id="btns"><p id="ins">Instructions: Click the button best describing the video. If multiple are accurate, choose the one furthest to the left. For other action, please provide a word or two best describing it.</p><div>');
           
           for(var i=0; i < vid['cands'].length; i++){
               $('#btns').append('<button class="a" id="but'+i+'" val="'+vid['cands'][i]+'">'+vid['cands'][i]+'</button>');
@@ -174,6 +177,13 @@ button {
           });
           $('#ctrl').append('<button class="b" id="submit" style="margin-top: 1cm;">Submit</button>');
           $('#submit').click(function(){
+              if(selected == ''){
+                  if(!failed){
+                    $('#ins').append(' <strong>Please select an action.</strong>');
+                    failed = true;
+                  }
+                  return;
+              }
               r = vid;
               r['ann'] = selected;
               r['othertxt'] = $('#other').val();
