@@ -147,7 +147,7 @@ button {
           
           $("#video")[0].play();
           
-          $('#ctrl').html('<div id="btns"><p id="ins">Instructions: Click the button best describing the video. If multiple are accurate, choose the one furthest to the left. For other action, please provide a word or two best describing it.</p><div>');
+          $('#ctrl').html('<div id="btns"><p id="ins">Instructions: Click the button best describing the video. If multiple are accurate, choose the one furthest to the left. For other action, please use a word from the auto-complete options.</p><div>');
           
           for(var i=0; i < vid['cands'].length; i++){
               $('#btns').append('<button class="a" id="but'+i+'" val="'+vid['cands'][i]+'">'+vid['cands'][i]+'</button>');
